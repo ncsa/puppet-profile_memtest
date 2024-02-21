@@ -1,0 +1,75 @@
+#!/usr/bin/bash
+######## memtest_script: Managed by Puppet ############
+
+# a script for memory testing with stream
+# Based off the slurmd prologue script for NCSA's Magnus cluster
+
+# Install this file on all of the compute nodes as
+#    /var/spool/slurmd/prologue
+
+# SVCPLAN-4288 Memory testing with stream
+# Use -v flag for verbose mode (displays output to screen)
+
+############### System Configurations #################
+
+# Set path to STREAM program
+stream_command=<%= $profile_memtest::stream_path %>
+
+# Set path to Puppet managed expected performance table (nodename regex, expected performance)
+performance_table=/root/scripts/memtest_table 
+
+#######################################################
+
+# Verbose mode. Invoke with "-v" flag
+_V=0
+while getopts "v" OPTION
+do
+  case $OPTION in
+    v) _V=1
+    ;;
+  esac
+done
+
+# Wrapper function for verbose mode
+verbose () {
+  if [[ $_V -eq 1 ]]
+  then
+    echo "$@"
+  fi
+}
+
+# Look up expected performance value for current node 
+found=-1
+while read -r key val
+do
+  if [[ "$HOSTNAME" =~ $key ]]
+  then
+    performance_threshold=$val
+    found=1
+    break
+  fi
+done < $performance_table
+
+# Exit if hostname cannot be matched in the lookup table
+if (( $found < 0 ))
+then
+  logger "STREAM: no match for $HOSTNAME in the performance table"
+  verbose "Error: no match for $HOSTNAME in the performance table"
+  exit 1
+fi
+
+# Grab Triad stream rate from STREAM
+speed=`taskset -c 0 $stream_command | grep Triad | awk '{print \$2}'`
+
+# Truncate speed for arithmetic comparison
+if (( ${speed%.*} < $performance_threshold ))
+then
+  logger "STREAM - $HOSTNAME is underperforming. Expected: $performance_threshold Actual: $speed"
+  verbose "$HOSTNAME is underperforming. Expected : $performance_threshold Actual: $speed"
+  exit 1
+else
+  verbose "Performance is sufficient. Expected: $performance_threshold Actual: $speed"
+fi
+
+exit 0
+

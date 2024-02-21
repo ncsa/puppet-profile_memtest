@@ -10,58 +10,39 @@ information to include in your README.
 
 1. [Description](#description)
 1. [Setup - The basics of getting started with profile_memtest](#setup)
-    * [What profile_memtest affects](#what-profile_memtest-affects)
-    * [Setup requirements](#setup-requirements)
-    * [Beginning with profile_memtest](#beginning-with-profile_memtest)
 1. [Usage - Configuration options and additional functionality](#usage)
+1. [Dependencies](#dependencies)
 1. [Limitations - OS compatibility, etc.](#limitations)
 1. [Development - Guide for contributing to the module](#development)
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your
-module does and what kind of problems users can solve with it.
+This puppet profile creates scripts to run STREAM for performance testing (memory) on compute nodes
 
-This should be a fairly short description helps the user decide if your module
-is what they want.
+It does not install STREAM. 
 
 ## Setup
 
-### What profile_memtest affects **OPTIONAL**
-
-If it's obvious what your module touches, you can skip this section. For
-example, folks can probably figure out that your mysql_instance module affects
-their MySQL instances.
-
-If there's more that they should know about, though, this is the place to
-mention:
-
-* Files, packages, services, or operations that the module will alter, impact,
-  or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
-
-### Setup Requirements **OPTIONAL**
-
-If your module requires anything extra before setting up (pluginsync enabled,
-another module, etc.), mention it here.
-
-If your most recent release breaks compatibility or requires particular steps
-for upgrading, you might want to include an additional "Upgrading" section here.
-
-### Beginning with profile_memtest
-
-The very basic steps needed for a user to get the module up and running. This
-can include setup steps, if necessary, or it can be an example of the most basic
-use of the module.
+Include profile_memtest	in a puppet profile file.
+```
+include ::profile_memtest
+```
 
 ## Usage
 
-Include usage examples for common use cases in the **Usage** section. Show your
-users how to use your module to solve problems, and be sure to include code
-examples. Include three to five examples of the most important or common tasks a
-user can accomplish with your module. Show users how to accomplish more complex
-tasks that involve different types, classes, and functions working in tandem.
+Setup a desired performance table using `profile_memtest::performance_table`. The script will reference the first column as a regex to match the host, and the second column to the expected / desired STREAM Triad performance.
+
+Define `profile_memtest::stream_path` if STREAM is not located in "/var/spool/slurmd/mom_priv/bin/stream"
+
+The profile will create two files in /root/scripts/
+- `memtest_script` This is the executable that you can run
+- `memtest_table` This is what the executable will reference
+
+A successful run will not create any output. Use -v flag for verbose mode (displays output to screen).
+
+## Dependencies
+
+This profile requires STREAM to be installed. 
 
 ## Reference
 
@@ -70,41 +51,13 @@ Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your
 module. For details on how to add code comments and generate documentation with
 Strings, see the [Puppet Strings documentation][2] and [style guide][3].
 
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the
-root of your module directory and list out each of your module's classes,
-defined types, facts, functions, Puppet tasks, task plans, and resource types
-and providers, along with the parameters for each.
-
-For each element (class, defined type, function, and so on), list:
-
-* The data type, if applicable.
-* A description of what the element does.
-* Valid values, if the data type doesn't make it obvious.
-* Default value, if any.
-
-For example:
-
-```
-### `pet::cat`
-
-#### Parameters
-
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
-```
-
 ## Limitations
 
-In the Limitations section, list any incompatibilities, known issues, or other
-warnings.
+n/a
 
 ## Development
 
-In the Development section, tell other users the ground rules for contributing
-to your project and how they should submit their work.
+This Common Puppet Profile is managed by NCSA for internal usage.
 
 ## Release Notes/Contributors/Etc. **Optional**
 

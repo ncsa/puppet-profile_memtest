@@ -8,24 +8,21 @@
 #
 # @example
 #   include profile_memtest
-class profile_memtest {
-
-  Hash   $performance_table,
-  String $stream_path
-
+class profile_memtest (
+  String $performance_table,
+  String $stream_path,
+) {
 # table
-#  file {
-#    ensure  => 'file',
-#    mode    => '644',
-#    content => template('profile_memtest/memtest.table.epp'),
-#  }
+  file { '/root/scripts/memtest_table':
+    ensure  => 'file',
+    mode    => '644',
+    content => "${performance_table}",
+  }
 
 # script
   file { '/root/scripts/memtest_script':
     ensure  => file,
     mode    => '755',
-#    content => template('profile_memtest/memtest.script.epp'),
-    content => "${stream_path}",  
+    content => epp( 'profile_memtest/memtest.script.epp' ),
   }
-
 }
