@@ -10,7 +10,7 @@
 #   include profile_memtest
 class profile_memtest {
 
-  Hash   $performance_table
+  Hash   $performance_table,
   String $stream_path
 
 # table
