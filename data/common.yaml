@@ -1,1 +1,5 @@
---- {}
+---
+
+profile_memtest::performance_table: {}
+profile_memtest::stream_path: "/var/spool/slurmd/mom_priv/bin/stream"
+
