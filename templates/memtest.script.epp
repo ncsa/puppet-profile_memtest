@@ -2,7 +2,7 @@
 ######## memtest_script: Managed by Puppet ############
 
 # a script for memory testing with stream
-# Based off the slurmd prologue script for NCSA's Magnus cluster
+# Based off the slurmd prologue script for NCSA's Industry cluster
 
 # Install this file on all of the compute nodes as
 #    /var/spool/slurmd/prologue

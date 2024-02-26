@@ -1,10 +1,7 @@
 # profile_memtest
 
-Welcome to your new module. A short overview of the generated parts can be found
-in the [PDK documentation][1].
-
-The README template below provides a starting point with details about what
-information to include in your README.
+![pdk-validate](https://github.com/ncsa/puppet-profile_memtest/workflows/pdk-validate/badge.svg)
+![yamllint](https://github.com/ncsa/puppet-profile_memtest/workflows/yamllint/badge.svg)
 
 ## Table of Contents
 
@@ -30,7 +27,16 @@ include ::profile_memtest
 
 ## Usage
 
-Setup a desired performance table using `profile_memtest::performance_table`. The script will reference the first column as a regex to match the host, and the second column to the expected / desired STREAM Triad performance.
+Setup a desired performance table using `profile_memtest::performance_table`. The script will reference the first column as a regex to match the host, and the second column for the expected / desired STREAM Triad performance.
+If `performance_table` is not defined, the script will error out.
+
+Example
+```yaml
+profile_memtest::performance_table: |
+  ^mg0([0-7]|8[0-4]) 13500
+  ^mg08[5-8] 13000
+  ^mgtest0[1-5] 15000
+```
 
 Define `profile_memtest::stream_path` if STREAM is not located in "/var/spool/slurmd/mom_priv/bin/stream"
 

@@ -1,7 +1,4 @@
 ---
 
-profile_memtest::performance_table: |
-  ^mg0([0-7]|8[0-4]) 13500
-  ^mg08[5-8] 13000
-  ^mgtest0[1-5] 15000
+#profile_memtest::performance_table: |
 profile_memtest::stream_path: "/var/spool/slurmd/mom_priv/bin/stream"
