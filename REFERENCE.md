@@ -33,7 +33,9 @@ The following parameters are available in the `profile_memtest` class:
 
 Data type: `String`
 
-A hash of regex representing a range of nodes and their expected STREAM triad performance values
+A multi-line string with space-delimited key value pairs as follows:
+- key: regex representing a range of nodes
+- value: the expected STREAM triad performance values for those nodes
 
 ##### <a name="stream_path"></a>`stream_path`
 
