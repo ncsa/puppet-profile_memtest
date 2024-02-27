@@ -27,7 +27,9 @@ include ::profile_memtest
 
 ## Usage
 
-Setup a desired performance table using `profile_memtest::performance_table`. The script will reference the first column as a regex to match the host, and the second column for the expected / desired STREAM Triad performance.
+Setup a desired performance table using `profile_memtest::performance_table` (multi-line string).
+The 1st column contains regex to match the host running the script.
+The 2nd column contains expected / desired STREAM Triad performance.
 If `performance_table` is not defined, the script will error out.
 
 Example
@@ -38,13 +40,13 @@ profile_memtest::performance_table: |
   ^mgtest0[1-5] 15000
 ```
 
-Define `profile_memtest::stream_path` if STREAM is not located in "/var/spool/slurmd/mom_priv/bin/stream"
+If STREAM is not located in the default installation path (/var/spool/slurmd/mom_priv/bin/stream), define `profile_memtest::stream_path`.
 
 The profile will create two files in /root/scripts/
-- `memtest_script` This is the executable that you can run
-- `memtest_table` This is what the executable will reference
+- `memtest_script` The executable that you can run
+- `memtest_table`  The reference table for desired STREAM performances
 
-A successful run will not create any output. Use -v flag for verbose mode (displays output to screen).
+A successful run will not display any output. Use the `-v` flag for verbose mode to display output to screen.
 
 ## Dependencies
 
@@ -64,13 +66,3 @@ n/a
 ## Development
 
 This Common Puppet Profile is managed by NCSA for internal usage.
-
-## Release Notes/Contributors/Etc. **Optional**
-
-If you aren't using changelog, put your release notes here (though you should
-consider using changelog). You can also add any additional sections you feel are
-necessary or important to include here. Please use the `##` header.
-
-[1]: https://puppet.com/docs/pdk/latest/pdk_generating_modules.html
-[2]: https://puppet.com/docs/puppet/latest/puppet_strings.html
-[3]: https://puppet.com/docs/puppet/latest/puppet_strings_style.html
