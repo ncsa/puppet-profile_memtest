@@ -1,16 +1,17 @@
 #!/usr/bin/bash
-######## memtest_script: Managed by Puppet ############
-
+# Memtest Script
+#
+# THIS FILE IS MANAGED BY PUPPET
+#
 # a script for memory testing with stream
 # Based off the slurmd prologue script for NCSA's Industry cluster
-
+#
 # Install this file on all of the compute nodes as
 #    /var/spool/slurmd/prologue
-
+#
 # SVCPLAN-4288 Memory testing with stream
 # Use -v flag for verbose mode (displays output to screen)
 
-############### System Configurations #################
 
 # Set path to STREAM program
 stream_command=<%= $profile_memtest::stream_path %>
@@ -18,7 +19,6 @@ stream_command=<%= $profile_memtest::stream_path %>
 # Set path to Puppet managed expected performance table (nodename regex, expected performance)
 performance_table=/root/scripts/memtest_table 
 
-#######################################################
 
 # Verbose mode. Invoke with "-v" flag
 _V=0
@@ -38,38 +38,53 @@ verbose () {
   fi
 }
 
-# Look up expected performance value for current node 
-found=-1
-while read -r key val
+# Read memtest_table for the appropriate performance values and core counts (if defined)
+while read -r host threshold cores
 do
-  if [[ "$HOSTNAME" =~ $key ]]
+  if [[ "$HOSTNAME" =~ $host ]]
   then
-    performance_threshold=$val
+    performance_threshold=$threshold
+    core_array=($cores)
     found=1
     break
   fi
 done < $performance_table
 
 # Exit if hostname cannot be matched in the lookup table
-if (( $found < 0 ))
+if [[ -z "$found" ]]
 then
   logger "STREAM: no match for $HOSTNAME in the performance table"
   verbose "Error: no match for $HOSTNAME in the performance table"
   exit 1
 fi
 
-# Grab Triad stream rate from STREAM
-speed=`taskset -c 0 $stream_command | grep Triad | awk '{print \$2}'`
-
-# Truncate speed for arithmetic comparison
-if (( ${speed%.*} < $performance_threshold ))
+# Set core_array to scan core 0 if not otherwise specified
+if [[ -z "$core_array" ]]
 then
-  logger "STREAM - $HOSTNAME is underperforming. Expected: $performance_threshold Actual: $speed"
-  verbose "$HOSTNAME is underperforming. Expected : $performance_threshold Actual: $speed"
-  exit 1
-else
-  verbose "Performance is sufficient. Expected: $performance_threshold Actual: $speed"
+  core_array=(0)
 fi
 
-exit 0
+# Grab Triad stream rate from STREAM. Loop through all cores
+for ((i=0; i<${#core_array[@]}; i++))
+do
+  speed=`taskset -c ${core_array[$i]} $stream_command | grep Triad | awk '{print \$2}'`
 
+  if [[ -z "$speed" ]]
+  then
+    logger "STREAM - Failed to run stream on core ${core_array[$i]}."
+    verbose "STREAM - Failed to run stream on core ${core_array[$i]}."
+    exit 1
+  fi
+
+# Truncate speed for arithmetic comparison
+  if (( ${speed%.*} < $performance_threshold ))
+  then
+    logger "STREAM - $HOSTNAME is underperforming. Expected: $performance_threshold Actual: $speed Core: ${core_array[$i]}"
+    verbose "$HOSTNAME is underperforming. Expected : $performance_threshold Actual: $speed Core: ${core_array[$i]}"
+    exit 1
+  else
+    verbose "Performance is sufficient. Expected: $performance_threshold Actual: $speed Core: ${core_array[$i]}"
+  fi
+done
+
+exit 0

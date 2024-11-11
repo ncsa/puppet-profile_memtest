@@ -30,13 +30,14 @@ include ::profile_memtest
 Setup a desired performance table using `profile_memtest::performance_table` (multi-line string).
 The 1st column contains regex to match the host running the script.
 The 2nd column contains expected / desired STREAM Triad performance.
+Additional columns may be added if you want to run the script on multiple cores (NUMA nodes). The format requires a new column for each core number you want to test on.
 If `performance_table` is not defined, the script will error out.
 
 Example
 ```yaml
 profile_memtest::performance_table: |
-  ^mg0([0-7]|8[0-4]) 13500
-  ^mg08[5-8] 13000
+  ^mg0([0-7]|8[0-4]) 13500 0 1
+  ^mg08[5-8] 13000 0 16 32 48
   ^mgtest0[1-5] 15000
 ```
 
